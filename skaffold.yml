@@ -1,36 +1,42 @@
-apiVersion : skaffold/v4beta13
+apiVersion: skaffold/v4beta13
 kind: Config
 
 build:
+  local:
+    push: false
+
+  tagPolicy:
+    sha256: {}
+
   artifacts:
 
-  - image: ai-orchestration
-    context: ai-orchestration
-    docker:
-      dockerfile: dockerfile
-    sync:
-      infer:
-        - "src/**"  
+    - image: ai-orchestration
+      context: ai-orchestration
+      docker:
+        dockerfile: dockerfile
+      sync:
+        infer:
+          - "src/**"
 
-  - image: agent
-    context: sandbox/agent
-    docker:
-      dockerfile: dockerfile 
+    - image: agent
+      context: sandbox/agent
+      docker:
+        dockerfile: dockerfile
 
-  - image: router
-    context: sandbox/router
-    docker:
-      dockerfile: dockerfile    
+    - image: router
+      context: sandbox/router
+      docker:
+        dockerfile: dockerfile
 
-  - image: sandbox
-    context: sandbox/server
-    docker:
-      dockerfile: dockerfile       
+    - image: sandbox
+      context: sandbox/server
+      docker:
+        dockerfile: dockerfile
 
-  - image: template
-    context: sandbox/template
-    docker:
-      dockerfile: dockerfile    
+    - image: template
+      context: sandbox/template
+      docker:
+        dockerfile: dockerfile
 
 manifests:
   rawYaml:
@@ -44,4 +50,3 @@ manifests:
     - k8s/rbac-serviceaccount.yml
     - k8s/rbac-role.yml
     - k8s/rbac-rolebinding.yml
-   
