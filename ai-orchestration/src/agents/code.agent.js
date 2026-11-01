@@ -1,14 +1,21 @@
 import "dotenv/config";
 // import { ChatGroq } from "@langchain/groq";
 import  { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+// import {ChatMistralAI} from "@langchain/mistralai"
 import { listFiles, readFiles, updateFiles } from "./tools.js";
 import { createAgent } from "langchain";
 
 // const model = new ChatGroq({
-//   apiKey: process.env.GROQ_API_KEY,
-//   model: "openai/gpt-oss-20b",
-//   temperature: 0.7,
+//     apiKey: process.env.GROQ_API_KEY,
+//     model: "openai/gpt-oss-20b",
+//     temperature: 0.7,
 // });
+
+// const model = new ChatMistralAI({
+//   apiKey: process.env.MISTRAL_API_KEY,
+//   model : "mistral-medium-latest",
+//   temperature: 0.7
+// })
 
 const model = new ChatGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -59,12 +66,14 @@ DESIGN:
 - Use realistic content instead of Lorem ipsum.
 - Preserve the project's existing visual style unless the user requests a redesign.
 
-IMPORTANT:
-- Read only what you need.
-- Do not unnecessarily read the entire project.
-- Do not repeatedly call the same tool with the same files.
-- Prefer one well-batched updateFiles call when possible.
-- Build the requested feature completely and leave the project in a working state.
+TOOL CALLING RULES:
+- Always generate valid JSON arguments for every tool call.
+- Never truncate tool arguments.
+- Ensure every object, array and string is properly closed.
+- For updateFiles, provide complete file contents.
+- Do not split one logical file update into unnecessary repeated calls.
+- After a successful updateFiles call, do not repeat the same update.
+- If a tool call fails, inspect the error before retrying.
   `,
 }).withConfig({
   recursionLimit: 50,

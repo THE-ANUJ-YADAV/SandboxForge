@@ -44,6 +44,12 @@ spec:
                   name: ai-secret
                   key: GROQ_API_KEY
 
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-secret
+                  key: MISTRAL_API_KEY      
+
           livenessProbe:
             httpGet:
               path: /api/status/healthz
