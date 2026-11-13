@@ -1,15 +1,16 @@
 import "dotenv/config";
-// import { ChatGroq } from "@langchain/groq";
-import  { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatGroq } from "@langchain/groq";
+// import  { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 // import {ChatMistralAI} from "@langchain/mistralai"
 import { listFiles, readFiles, updateFiles } from "./tools.js";
 import { createAgent } from "langchain";
 
-// const model = new ChatGroq({
-//     apiKey: process.env.GROQ_API_KEY,
-//     model: "openai/gpt-oss-20b",
-//     temperature: 0.7,
-// });
+const model = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "openai/gpt-oss-120b",
+    temperature: 0,
+});
+
 
 // const model = new ChatMistralAI({
 //   apiKey: process.env.MISTRAL_API_KEY,
@@ -17,11 +18,14 @@ import { createAgent } from "langchain";
 //   temperature: 0.7
 // })
 
-const model = new ChatGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  model: "gemini-3-flash-preview",
-  temperature: 0.7,
-});
+// const model = new ChatGoogleGenerativeAI({
+//   apiKey: process.env.GEMINI_API_KEY,
+//   model: "gemini 2.5 Flash TTS",
+//   "temperature": 0.9,
+//           "topK": 40,
+//           "topP": 0.8,
+//           "maxOutputTokens": 2048
+// });
 
 
 

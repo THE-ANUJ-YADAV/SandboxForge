@@ -77,43 +77,50 @@
 
 
 
+
 import axios from "axios";
 import { tool } from "langchain/tools";
 import * as z from "zod";
 
 export const listFiles = tool(
-    async ({ },config) => {
+    async ({}, config) => {
+        const writer = config.writer;
 
-        const writer = config.writer
-
-        writer("Listing files in project directory....\n");
+        writer("Listing files in project directory...\n");
 
         const response = await axios.get(
             `http://sandbox-service-${config.context.projectId}:3000/list-files`
         );
 
-        writer("Files listed sucessfully." + "Files: " + response.data.files.join(",") + "\n")
+        writer(
+            "Files listed successfully.\nFiles: " +
+            response.data.files.join(", ") + "\n"
+        );
 
         return JSON.stringify(response.data.files);
     },
     {
         name: "list_files",
         description:
-            "List all the files in the project directory. Use this first to understand the project structure.",
+            "List all files in the project directory. Use this first to understand the project structure.",
         schema: z.object({})
     }
 );
 
 export const readFiles = tool(
     async ({ files }, config) => {
-        
-        const writer = config.writer
+        const writer = config.writer;
 
-        writer("Reading files..." + files.join(",") + "\n")
+        writer("Reading files: " + files.join(", ") + "\n");
 
-        const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/read-files?files=` + files.join(","))
+        const response = await axios.get(
+            `http://sandbox-service-${config.context.projectId}:3000/read-files`,
+            {
+                params: { files: files.join(",") }
+            }
+        );
 
-        writer("Files read successfully.\n")
+        writer("Files read successfully.\n");
 
         return JSON.stringify(response.data.files);
     },
@@ -122,50 +129,44 @@ export const readFiles = tool(
         description:
             "Read the contents of specified files. Only read files relevant to the requested task.",
         schema: z.object({
-            files: z
-                .array(z.string())
-                .describe(
-                    "List of file paths to read. Only include files relevant to the task."
-                )
+            files: z.array(z.string()).describe(
+                "List of file paths to read."
+            )
         })
     }
 );
 
 export const updateFiles = tool(
     async ({ files }, config) => {
-       
-        const writer = writer.write
+        const writer = config.writer;
 
-        writer("Updating files..." + files.map(f => f.file).join(",") + "\n")
+        writer(
+            "Updating files: " +
+            files.map(f => f.file).join(", ") + "\n"
+        );
 
         const response = await axios.patch(
-            `http://sandbox-service-${config.context.projectId }:3000/update-files`,
+            `http://sandbox-service-${config.context.projectId}:3000/update-files`,
             {
                 updates: files
             }
         );
 
-        writer("Files Updated successfully...\n")
+        writer("Files updated successfully.\n");
 
         return JSON.stringify(response.data.results);
     },
     {
         name: "update_files",
         description:
-            "Update or create files. Provide the file path and complete new file content.",
+            "Create or update multiple project files. Provide file paths and complete new file contents.",
         schema: z.object({
-            files: z
-                .array(
-                    z.object({
-                        file: z
-                            .string()
-                            .describe("The file path to update or create"),
-                        content: z
-                            .string()
-                            .describe("The complete new content of the file")
-                    })
-                )
-                .describe("List of files to update or create")
+            files: z.array(
+                z.object({
+                    file: z.string(),
+                    content: z.string()
+                })
+            )
         })
     }
 );

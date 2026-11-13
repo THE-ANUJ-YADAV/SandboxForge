@@ -4,12 +4,19 @@ import path from 'path'
 import fs from 'fs'
 import { Server } from 'socket.io'
 import http from 'http'
+import cors from 'cors';
 import pty from 'node-pty'
 
 const WORKING_DIR = '/workspace'
 
 const app = express()
 const httpServer = http.createServer(app)
+
+app.use(morgan('dev'));
+app.use(cors({
+    methods: [ "GET", "POST", "PATCH", "DELETE" ],
+    origin: "*",
+}));
 
 app.use(morgan('dev'))
 app.use(express.json())

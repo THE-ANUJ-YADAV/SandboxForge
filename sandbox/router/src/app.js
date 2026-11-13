@@ -32,7 +32,7 @@ function getProxy(sandboxId) {
 }
 
 function getAgentProxy(sandboxId) {
-    const target = `http://sandbox-service-${sandboxId}:3000`;
+    const target = `http://sandbox-service-${sandboxId}:3000`
 
     if (!agentProxies[sandboxId]) {
         agentProxies[sandboxId] = createProxyMiddleware({
@@ -45,22 +45,36 @@ function getAgentProxy(sandboxId) {
     return agentProxies[sandboxId]
 }
 
-
 app.use((req, res, next) => {
-    const host = req.headers.host
+    const host = req.headers.host || ''
+    const parts = host.split('.')
+    const sandboxId = parts[0]
 
-    const sandboxId = host.split('.')[0]
-
-    if(host.split('.')[1] === 'agent'){
-       return getAgentProxy(sandboxId)(req,res,next)
+    if (parts[1] === 'agent') {
+        return getAgentProxy(sandboxId)(req, res, next)
     }
 
-    else if(host.split('.')[1] === 'preview'){
+    if (parts[1] === 'preview') {
         return getProxy(sandboxId)(req, res, next)
     }
+
+    next()
 })
 
+export function handleUpgrade(req, socket, head) {
+    const host = req.headers.host || ''
+    const parts = host.split('.')
+    const sandboxId = parts[0]
 
+    if (parts[1] === 'agent') {
+        return getAgentProxy(sandboxId).upgrade(req, socket, head)
+    }
 
+    if (parts[1] === 'preview') {
+        return getProxy(sandboxId).upgrade(req, socket, head)
+    }
+
+    socket.destroy()
+}
 
 export default app
