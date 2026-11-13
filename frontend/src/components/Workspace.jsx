@@ -19,15 +19,12 @@ export default function Workspace() {
     panelSizes,
     terminalPosition,
     updatePanelSize,
-    togglePanelVisibility,
     isResizing,
     saveToast,
   } = useLayout();
 
-  // Filter only visible horizontal panels
   const visiblePanels = panelOrder.filter((key) => panelVisibility[key]);
 
-  // Render component for each panel key
   const renderPanelComponent = (key) => {
     switch (key) {
       case 'explorer':
@@ -43,7 +40,6 @@ export default function Workspace() {
     }
   };
 
-  // Handle resizing between panel at index and index + 1
   const handleVerticalResize = (leftIndex, delta) => {
     const leftKey = visiblePanels[leftIndex];
     const rightKey = visiblePanels[leftIndex + 1];
@@ -51,19 +47,18 @@ export default function Workspace() {
     if (!leftKey) return;
 
     if (leftKey === 'explorer') {
-      const next = (panelSizes.explorer || 250) + delta;
+      const next = (panelSizes.explorer || 256) + delta;
       updatePanelSize('explorer', Math.max(160, Math.min(500, next)));
     } else if (leftKey === 'ai') {
-      const next = (panelSizes.ai || 340) + delta;
+      const next = (panelSizes.ai || 320) + delta;
       updatePanelSize('ai', Math.max(240, Math.min(600, next)));
     } else if (rightKey === 'ai') {
-      const next = (panelSizes.ai || 340) - delta;
+      const next = (panelSizes.ai || 320) - delta;
       updatePanelSize('ai', Math.max(240, Math.min(600, next)));
     } else if (rightKey === 'explorer') {
-      const next = (panelSizes.explorer || 250) - delta;
+      const next = (panelSizes.explorer || 256) - delta;
       updatePanelSize('explorer', Math.max(160, Math.min(500, next)));
     } else {
-      // Resizing between editor and preview
       if (leftKey === 'editor') {
         const next = (panelSizes.editor || 450) + delta;
         updatePanelSize('editor', Math.max(200, next));
@@ -75,28 +70,29 @@ export default function Workspace() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 dark:bg-[#090d16] text-slate-800 dark:text-slate-200 font-sans select-none transition-colors duration-150">
       {/* 1. Header / Navbar */}
       <Header />
 
       {/* 2. Main Middle Workspace */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Collapsed Dock (for restored access to collapsed sidebars) */}
+      <main className="flex-1 flex overflow-hidden relative">
+        {/* Left Collapsed Dock */}
         <CollapsedDock side="left" />
 
         {/* Center Panel Columns Row */}
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-50 dark:bg-obsidian-900 transition-colors">
           {/* Main Horizontal Panels Row */}
           <div className="flex-1 flex min-h-0 overflow-hidden relative">
             {visiblePanels.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
-                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">All panels are hidden</p>
-                <p className="text-xs text-slate-400 mt-1">Use the Layout menu or side docks to restore workspace panels.</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">All panels are hidden</p>
+                <p className="text-xs text-slate-500 mt-1">Use the Layout menu or side docks to restore workspace panels.</p>
               </div>
             ) : (
               visiblePanels.map((panelKey, index) => {
                 const isSidebar = panelKey === 'explorer' || panelKey === 'ai';
-                const panelWidth = panelSizes[panelKey];
+                const defaultWidth = panelKey === 'explorer' ? 256 : panelKey === 'ai' ? 320 : undefined;
+                const panelWidth = panelSizes[panelKey] || defaultWidth;
 
                 return (
                   <div key={panelKey} className="contents">
@@ -104,7 +100,6 @@ export default function Workspace() {
                       panelKey={panelKey}
                       isFlex={!isSidebar}
                       width={isSidebar ? panelWidth : undefined}
-                      onCollapse={() => togglePanelVisibility(panelKey)}
                     >
                       {renderPanelComponent(panelKey)}
                     </PanelContainer>
@@ -142,7 +137,7 @@ export default function Workspace() {
 
         {/* Right Collapsed Dock */}
         <CollapsedDock side="right" />
-      </div>
+      </main>
 
       {/* 3. Developer Status Bar */}
       <StatusBar />
@@ -150,13 +145,13 @@ export default function Workspace() {
       {/* 4. Customize Layout Modal */}
       <CustomizeLayoutModal />
 
-      {/* 5. Resizing Iframe Shield (prevents iframe from capturing mouse drag events) */}
+      {/* 5. Resizing Shield */}
       {isResizing && <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />}
 
-      {/* 6. Toast Notification for Layout Save / Preset Apply */}
+      {/* 6. Toast Notification for Layout Save */}
       {saveToast && (
-        <div className="fixed bottom-9 right-4 z-50 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-3.5 py-2 rounded-xl shadow-2xl text-xs font-medium flex items-center gap-2 animate-fadeIn border border-slate-700 dark:border-slate-300">
-          <Check className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" />
+        <div className="fixed bottom-9 right-4 z-50 bg-slate-900 dark:bg-obsidian-900 border border-slate-700 text-white px-3.5 py-2 rounded-xl shadow-2xl text-xs font-medium flex items-center gap-2 animate-fadeIn">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{saveToast}</span>
         </div>
       )}

@@ -14,7 +14,6 @@ import {
   Globe,
   Sparkles,
   Terminal,
-  Check
 } from 'lucide-react';
 import { useLayout } from '../context/useLayout';
 import { PRESETS } from '../constants/presets';
@@ -32,13 +31,11 @@ export default function CustomizeLayoutModal() {
     panelOrder,
     panelVisibility,
     terminalPosition,
-    panelSizes,
     isCustomizing,
     setIsCustomizing,
     reorderPanels,
     setPanelVisibility,
     setTerminalPosition,
-    updatePanelSize,
     saveLayout,
     resetLayout,
     applyPreset,
@@ -89,13 +86,13 @@ export default function CustomizeLayoutModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn select-none">
-      <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+    <div className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn select-none">
+      <div className="w-full max-w-xl bg-white dark:bg-obsidian-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] transition-colors">
         {/* Modal Header */}
         <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Sliders className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center">
+              <Sliders className="w-4 h-4 text-indigo-600 dark:text-cyan-400" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Customize Workspace Layout</h3>
@@ -106,7 +103,7 @@ export default function CustomizeLayoutModal() {
           </div>
           <button
             onClick={() => setIsCustomizing(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -116,7 +113,7 @@ export default function CustomizeLayoutModal() {
         <div className="p-5 overflow-y-auto space-y-5 text-xs">
           {/* Quick Presets Bar */}
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
               Start from a Preset
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -126,129 +123,79 @@ export default function CustomizeLayoutModal() {
                   <button
                     key={p.id}
                     onClick={() => applyPreset(p.id)}
-                    className={`p-2.5 rounded-xl border text-left transition-all ${
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-50 dark:bg-indigo-950/80 border-indigo-500 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300'
+                        ? 'bg-indigo-50 border-indigo-400 text-indigo-700 dark:bg-indigo-600/20 dark:border-indigo-500 dark:text-indigo-300 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50 text-slate-600 hover:text-slate-900 dark:border-slate-800 dark:hover:border-slate-700 dark:bg-obsidian-900 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                   >
-                    <div className="font-semibold flex items-center justify-between">
-                      <span>{p.name}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5" />}
-                    </div>
-                    <div className="text-[10px] text-slate-400 dark:text-slate-500 line-clamp-1 mt-0.5">
-                      {p.id === 'default'
-                        ? 'Standard 4-column'
-                        : p.id === 'ai-focus'
-                        ? 'AI left dock'
-                        : p.id === 'editor-focus'
-                        ? 'Wider code area'
-                        : 'Wider preview'}
-                    </div>
+                    <div className="font-semibold text-xs text-slate-900 dark:text-slate-200">{p.name}</div>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 line-clamp-1">{p.description}</div>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Panel Ordering List */}
+          {/* Reorder Panels List */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Workspace Columns (Left to Right)
-              </label>
-              <span className="text-[10px] text-slate-400">Drag handles or use arrows to reorder</span>
-            </div>
-
-            <div className="space-y-2">
-              {panelOrder.map((panelKey, idx) => {
-                const meta = PANEL_METADATA[panelKey];
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              Workspace Columns Order (Drag or use arrows)
+            </label>
+            <div className="space-y-1.5">
+              {panelOrder.map((panelKey, index) => {
+                const meta = PANEL_METADATA[panelKey] || { name: panelKey, icon: Code, description: '' };
                 const Icon = meta.icon;
                 const isVisible = panelVisibility[panelKey];
-                const isDraggingThis = draggedItem === panelKey;
-                const isDragOverThis = dragOverItem === panelKey;
+                const isDragTarget = dragOverItem === panelKey;
 
                 return (
                   <div
                     key={panelKey}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, panelKey)}
                     onDragOver={(e) => handleDragOver(e, panelKey)}
                     onDrop={(e) => handleDrop(e, panelKey)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                      isDragOverThis
-                        ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/50 scale-[1.01]'
-                        : isDraggingThis
-                        ? 'opacity-40 border-dashed border-slate-400'
-                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
+                    className={`p-2.5 rounded-xl border flex items-center justify-between transition-all ${
+                      isDragTarget
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40'
+                        : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-obsidian-900'
                     }`}
                   >
-                    {/* Left: Drag Handle & Info */}
                     <div className="flex items-center gap-2.5">
-                      <div
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, panelKey)}
-                        className="cursor-grab active:cursor-grabbing p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                        title="Drag to reorder"
-                      >
+                      <div className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
                         <GripVertical className="w-4 h-4" />
                       </div>
-
-                      <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-indigo-500 shrink-0">
+                      <div className="w-6 h-6 rounded-md bg-white dark:bg-obsidian-950 flex items-center justify-center text-indigo-600 dark:text-cyan-400 border border-slate-200 dark:border-slate-800">
                         <Icon className="w-3.5 h-3.5" />
                       </div>
-
                       <div>
-                        <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                          <span>{meta.name}</span>
-                          <span className="text-[10px] text-slate-400 font-normal">Column #{idx + 1}</span>
-                        </div>
-                        <div className="text-[11px] text-slate-400 dark:text-slate-500">{meta.description}</div>
+                        <div className="font-semibold text-slate-800 dark:text-slate-200">{meta.name}</div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500">{meta.description}</div>
                       </div>
                     </div>
 
-                    {/* Right: Controls (Visibility, Width, Arrows) */}
-                    <div className="flex items-center gap-2">
-                      {/* Width adjustment */}
-                      <div className="hidden sm:flex items-center gap-1.5 bg-white dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] text-slate-400">Width:</span>
-                        <input
-                          type="number"
-                          min={150}
-                          max={900}
-                          step={20}
-                          value={panelSizes[panelKey] || 300}
-                          onChange={(e) => updatePanelSize(panelKey, Number(e.target.value))}
-                          className="w-14 text-center text-xs bg-transparent text-slate-700 dark:text-slate-200 font-mono focus:outline-none"
-                        />
-                        <span className="text-[10px] text-slate-400">px</span>
-                      </div>
-
-                      {/* Move Up / Down Buttons */}
-                      <div className="flex items-center gap-0.5">
-                        <button
-                          onClick={() => handleMoveUp(idx)}
-                          disabled={idx === 0}
-                          title="Move Left/Up"
-                          className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30"
-                        >
-                          <ArrowUp className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleMoveDown(idx)}
-                          disabled={idx === panelOrder.length - 1}
-                          title="Move Right/Down"
-                          className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30"
-                        >
-                          <ArrowDown className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Visibility Toggle Button */}
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0}
+                        className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-white disabled:opacity-30 cursor-pointer"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === panelOrder.length - 1}
+                        className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-white disabled:opacity-30 cursor-pointer"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         onClick={() => setPanelVisibility(panelKey, !isVisible)}
-                        className={`p-1.5 rounded-lg border transition-colors ${
+                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                           isVisible
-                            ? 'bg-indigo-50 dark:bg-indigo-950/80 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400'
-                            : 'border-slate-200 dark:border-slate-700 text-slate-400'
+                            ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-600/20 dark:border-indigo-500/40 dark:text-cyan-300'
+                            : 'border-slate-200 text-slate-400 dark:border-slate-800 dark:text-slate-600'
                         }`}
                         title={isVisible ? 'Hide panel' : 'Show panel'}
                       >
@@ -262,18 +209,18 @@ export default function CustomizeLayoutModal() {
           </div>
 
           {/* Terminal Configuration */}
-          <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+          <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-obsidian-900 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-emerald-500" />
+                <Terminal className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span className="font-semibold text-slate-800 dark:text-slate-200">Terminal Configuration</span>
               </div>
               <button
                 onClick={() => setPanelVisibility('terminal', !panelVisibility.terminal)}
-                className={`p-1.5 rounded-lg border transition-colors ${
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                   panelVisibility.terminal
-                    ? 'bg-indigo-50 dark:bg-indigo-950/80 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-400'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-600/20 dark:border-indigo-500/40 dark:text-cyan-300'
+                    : 'border-slate-200 text-slate-400 dark:border-slate-800 dark:text-slate-600'
                 }`}
                 title={panelVisibility.terminal ? 'Hide terminal' : 'Show terminal'}
               >
@@ -283,23 +230,23 @@ export default function CustomizeLayoutModal() {
 
             <div className="flex items-center justify-between pt-1">
               <span className="text-slate-500 dark:text-slate-400">Terminal Dock Location:</span>
-              <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-0.5 rounded-lg">
+              <div className="flex items-center bg-white dark:bg-obsidian-950 border border-slate-200 dark:border-slate-800 p-0.5 rounded-lg">
                 <button
                   onClick={() => setTerminalPosition('bottom')}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
                     terminalPosition === 'bottom'
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   Bottom Panel
                 </button>
                 <button
                   onClick={() => setTerminalPosition('right')}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
                     terminalPosition === 'right'
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   Right Side Dock
@@ -310,10 +257,10 @@ export default function CustomizeLayoutModal() {
         </div>
 
         {/* Modal Footer */}
-        <div className="px-5 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
+        <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-obsidian-950 flex items-center justify-between">
           <button
             onClick={resetLayout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 font-medium transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset to Defaults</span>
@@ -322,7 +269,7 @@ export default function CustomizeLayoutModal() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsCustomizing(false)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Close
             </button>
@@ -331,10 +278,10 @@ export default function CustomizeLayoutModal() {
                 saveLayout();
                 setIsCustomizing(false);
               }}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm dark:shadow-glow-indigo transition-all cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>Save & Apply</span>
+              <span>Save &amp; Apply</span>
             </button>
           </div>
         </div>

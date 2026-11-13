@@ -1,45 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "@xterm/xterm/css/xterm.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-obsidian-950: #070a0f;
+  --color-obsidian-900: #0a0e17;
+  --color-obsidian-850: #0f1422;
+  --color-obsidian-800: #151b2d;
+  --color-obsidian-750: #1c243a;
+  --color-obsidian-700: #242f4c;
+
+  --color-forge-primary: #6366f1;
+  --color-forge-accent: #38bdf8;
+  --color-forge-emerald: #10b981;
+  --color-forge-violet: #a855f7;
+  --color-forge-pink: #ec4899;
+  --color-forge-amber: #f59e0b;
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, monospace;
+
+  --shadow-glow-cyan: 0 0 20px -3px rgba(56, 189, 248, 0.25);
+  --shadow-glow-indigo: 0 0 25px -4px rgba(99, 102, 241, 0.35);
+  --shadow-glow-emerald: 0 0 16px -2px rgba(16, 185, 129, 0.3);
+  --shadow-inner-glow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 :root {
   color-scheme: light dark;
-  --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbars for professional IDE look */
+body {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.dark body,
+html.dark body {
+  background-color: #090d16;
+  color: #e2e8f0;
+}
+
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(241, 245, 249, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.45);
+  background: rgba(99, 102, 241, 0.6);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(10, 14, 23, 0.4);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(99, 102, 241, 0.5);
 }
 
-/* Animations for popovers & toasts */
+/* Animations */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: cursor-blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

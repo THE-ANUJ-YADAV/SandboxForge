@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-[#090d16]" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SandboxForge — Next-Gen AI Cloud IDE</title>
+<!-- Tailwind CSS v3 CDN with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for Custom Palette -->
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: {
+              950: '#070a0f',
+              900: '#0a0e17',
+              850: '#0f1422',
+              800: '#151b2d',
+              750: '#1c243a',
+              700: '#242f4c'
+            },
+            forge: {
+              primary: '#6366f1',
+              accent: '#38bdf8',
+              emerald: '#10b981',
+              violet: '#a855f7',
+              pink: '#ec4899',
+              amber: '#f59e0b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Courier New', 'monospace']
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 20px -3px rgba(56, 189, 248, 0.25)',
+            'glow-indigo': '0 0 25px -4px rgba(99, 102, 241, 0.35)',
+            'glow-emerald': '0 0 16px -2px rgba(16, 185, 129, 0.3)',
+            'inner-glow': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.08)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- Typography & Global Glass Styling -->
+<style data-purpose="typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+<style data-purpose="custom-scrollbars">
+    /* Custom Sleek Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 14, 23, 0.4);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+  </style>
+<style data-purpose="animations">
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .animate-blink {
+      animation: cursor-blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-[#090d16] text-slate-200 overflow-hidden select-none">
+<!-- BEGIN: MainNavbar -->
+<header class="h-14 bg-obsidian-900/90 backdrop-blur-xl border-b border-slate-800/80 px-3.5 flex items-center justify-between shrink-0 z-30 select-none">
+<!-- Left Brand and Session Info -->
+<div class="flex items-center space-x-3.5">
+<!-- Logo -->
+<a class="flex items-center gap-2.5 group" href="#">
+<div class="relative w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-[1px] shadow-glow-indigo">
+<div class="w-full h-full bg-obsidian-950 rounded-[11px] flex items-center justify-center">
+<!-- Diamond Tech Icon -->
+<svg class="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+</svg>
+</div>
+</div>
+<div class="flex items-baseline gap-1.5">
+<span class="text-base font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">SandboxForge</span>
+<span class="text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cloud IDE</span>
+</div>
+</a>
+<!-- Divider -->
+<div class="h-4 w-px bg-slate-800"></div>
+<!-- Live Connection Pill -->
+<div class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full text-xs font-medium text-emerald-400">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span class="font-mono text-[11px] tracking-tight text-emerald-300">Connected: 01a1d3f5</span>
+<button class="text-emerald-400/70 hover:text-emerald-300 transition-colors" title="Copy Sandbox ID">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Center View Switcher Segmented Control -->
+<nav class="hidden md:flex items-center bg-obsidian-950/80 p-0.5 rounded-lg border border-slate-800/80 shadow-inner">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-sm shadow-indigo-600/30 transition-all">
+<svg class="w-3.5 h-3.5 text-indigo-200" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+        Split View
+      </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+        Preview
+      </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+        Editor
+      </button>
+</nav>
+<!-- Right Controls -->
+<div class="flex items-center space-x-2">
+<!-- Restart Sandbox Button -->
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-200 bg-obsidian-800 hover:bg-obsidian-750 border border-slate-700/60 shadow-sm transition-colors">
+<svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Restart Sandbox</span>
+</button>
+<!-- Reload Preview Icon -->
+<button class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors" title="Reload Frame">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v6h6M20 20v-6h-6M4.93 19.07A10 10 0 1119.07 4.93" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Open in New Tab -->
+<button class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors" title="Open preview in new tab">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<div class="h-4 w-px bg-slate-800"></div>
+<!-- Layout Selector -->
+<button class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white bg-slate-800/40 hover:bg-slate-800 rounded-md border border-slate-700/50 transition">
+<svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-6a1 1 0 01-1-1v-6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Layout</span>
+<span class="text-[10px] text-slate-400 font-mono">Custom</span>
+</button>
+<!-- Terminal Quick Toggle -->
+<button class="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/60 transition-colors" title="Toggle Terminal">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- User Avatar -->
+<div class="relative cursor-pointer pl-1">
+<div class="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-500 to-indigo-600 p-[1.5px] shadow">
+<div class="w-full h-full bg-obsidian-900 rounded-full flex items-center justify-center font-bold text-xs text-white">
+            A
+          </div>
+</div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-obsidian-900"></span>
+</div>
+</div>
+</header>
+<!-- END: MainNavbar -->
+<!-- BEGIN: MainWorkspaceLayout -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Sidebar: File Explorer -->
+<aside class="w-64 bg-obsidian-950/90 border-r border-slate-800/80 flex flex-col shrink-0">
+<!-- Section Header -->
+<div class="h-10 px-3.5 border-b border-slate-800/60 flex items-center justify-between text-xs font-semibold tracking-wider text-slate-400 uppercase">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-slate-300">File Explorer</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="p-1 rounded hover:bg-slate-800/80 text-slate-400 hover:text-slate-200" title="New File">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1 rounded hover:bg-slate-800/80 text-slate-400 hover:text-slate-200" title="Refresh files">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Quick Search Bar -->
+<div class="p-2.5">
+<div class="relative">
+<svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<input class="w-full bg-obsidian-900 border border-slate-800 rounded-md pl-8 pr-3 py-1.5 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-sans" placeholder="Search files... (⌘P)" type="text"/>
+</div>
+</div>
+<!-- File Tree Structure -->
+<div class="flex-1 overflow-y-auto px-2 space-y-0.5 text-xs font-mono">
+<!-- Root folder node -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded text-slate-400 hover:bg-slate-800/40 cursor-pointer font-sans font-medium">
+<svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-slate-300">src</span>
+</div>
+<!-- Inside src folder -->
+<div class="pl-4 space-y-0.5">
+<!-- Active File: App.tsx -->
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-indigo-600/15 border border-indigo-500/30 text-indigo-200 cursor-pointer group shadow-sm">
+<div class="flex items-center gap-2">
+<span class="text-cyan-400 text-xs font-bold">⚛</span>
+<span class="font-medium text-white">App.tsx</span>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-glow-cyan"></span>
+</div>
+<!-- Components Subfolder -->
+<div class="flex items-center gap-1.5 px-2 py-1 text-slate-400 hover:bg-slate-800/40 rounded cursor-pointer font-sans">
+<svg class="w-3.5 h-3.5 text-indigo-400/80" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-slate-300">components</span>
+</div>
+<div class="pl-4 space-y-0.5">
+<div class="flex items-center gap-2 px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-cyan-400 text-xs">⚛</span>
+<span>HeroSection.tsx</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-cyan-400 text-xs">⚛</span>
+<span>MetricCounter.tsx</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-cyan-400 text-xs">⚛</span>
+<span>Navbar.tsx</span>
+</div>
+</div>
+<!-- CSS File -->
+<div class="flex items-center gap-2 px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-violet-400 text-xs font-bold">#</span>
+<span>globals.css</span>
+</div>
+<!-- Entry Main -->
+<div class="flex items-center gap-2 px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-blue-400 text-xs font-bold">TS</span>
+<span>main.tsx</span>
+</div>
+</div>
+<!-- Root Files -->
+<div class="pt-2 border-t border-slate-800/40 mt-2 space-y-0.5">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-amber-400 text-xs font-mono">{ }</span>
+<span>package.json</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-blue-400 text-xs font-bold">TS</span>
+<span>vite.config.ts</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 cursor-pointer">
+<span class="text-cyan-400 text-xs">⚙</span>
+<span>tailwind.config.js</span>
+</div>
+</div>
+</div>
+<!-- Sidebar Footer Sync Status -->
+<div class="h-8 px-3 bg-obsidian-950 border-t border-slate-800/70 flex items-center justify-between text-[11px] text-slate-400">
+<span class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span>Synced with container</span>
+</span>
+<span class="text-slate-500 font-mono">React 19</span>
+</div>
+</aside>
+<!-- Center Workspace: Split Code Editor & Live Preview -->
+<div class="flex-1 flex flex-col min-w-0 bg-obsidian-900">
+<!-- Top Half / Code & Preview Split Container -->
+<div class="flex-1 flex min-h-0">
+<!-- Code Editor Pane -->
+<section class="flex-1 flex flex-col border-r border-slate-800/80 bg-[#0d121f] min-w-0" data-purpose="code-editor-panel">
+<!-- Editor Tabs -->
+<div class="h-10 bg-obsidian-950/80 border-b border-slate-800/80 flex items-center justify-between px-2">
+<div class="flex items-center space-x-1 overflow-x-auto">
+<!-- Active Tab -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-t-md bg-[#0d121f] border-t-2 border-indigo-500 border-x border-slate-800/80 text-xs font-medium text-slate-200">
+<span class="text-cyan-400 text-xs font-bold">⚛</span>
+<span>App.tsx</span>
+<button class="text-slate-500 hover:text-slate-300 ml-1">×</button>
+</div>
+<!-- Inactive Tab -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-t-md text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition cursor-pointer">
+<span class="text-cyan-400/80 text-xs">⚛</span>
+<span>HeroSection.tsx</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-t-md text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition cursor-pointer">
+<span class="text-violet-400 text-xs font-bold">#</span>
+<span>globals.css</span>
+</div>
+</div>
+<!-- Tab Actions -->
+<div class="flex items-center space-x-1 text-slate-400">
+<span class="text-[10px] font-mono bg-slate-800/70 px-2 py-0.5 rounded text-slate-400">UTF-8</span>
+<button class="p-1 hover:text-white" title="Format Document">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6h16M4 12h8m-8 6h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Editor Line Numbers & Code Lines -->
+<div class="flex-1 overflow-auto font-mono text-[13px] leading-6 p-3 flex selection:bg-indigo-600/30">
+<!-- Line Numbers -->
+<div class="text-slate-600 text-right pr-4 select-none w-8 shrink-0 font-normal">
+              1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20
+            </div>
+<!-- Code Content with Vibrant Syntax Highlighting -->
+<div class="flex-1 overflow-x-auto text-slate-300">
+<div><span class="text-violet-400 font-semibold">import</span> React, { useState } <span class="text-violet-400 font-semibold">from</span> <span class="text-emerald-300">'react'</span>;</div>
+<div><span class="text-violet-400 font-semibold">import</span> { HeroSection } <span class="text-violet-400 font-semibold">from</span> <span class="text-emerald-300">'./components/HeroSection'</span>;</div>
+<div><span class="text-violet-400 font-semibold">import</span> { MetricCounter } <span class="text-violet-400 font-semibold">from</span> <span class="text-emerald-300">'./components/MetricCounter'</span>;</div>
+<div> </div>
+<div><span class="text-violet-400 font-semibold">export default function</span> <span class="text-amber-300 font-medium">App</span>() {</div>
+<div class="pl-4"><span class="text-violet-400 font-semibold">const</span> [count, setCount] = <span class="text-amber-300">useState</span>(<span class="text-cyan-400">42</span>);</div>
+<div> </div>
+<div class="pl-4"><span class="text-violet-400 font-semibold">return</span> (</div>
+<div class="pl-8 text-cyan-300">&lt;<span class="text-cyan-400">div</span> <span class="text-violet-300">className</span>=<span class="text-emerald-300">"min-h-screen bg-slate-950 text-white"</span>&gt;</div>
+<div class="pl-12 text-cyan-300">&lt;<span class="text-amber-300">HeroSection</span></div>
+<div class="pl-16"><span class="text-violet-300">title</span>=<span class="text-emerald-300">"Build Faster with AI Sandboxes"</span></div>
+<div class="pl-16"><span class="text-violet-300">badge</span>=<span class="text-emerald-300">"V2.4 Cloud Release"</span></div>
+<div class="pl-12 text-cyan-300">/&gt;</div>
+<div class="pl-12 text-cyan-300">&lt;<span class="text-amber-300">MetricCounter</span></div>
+<div class="pl-16"><span class="text-violet-300">value</span>={<span class="text-cyan-400">count</span>}</div>
+<div class="pl-16"><span class="text-violet-300">onIncrement</span>={() =&gt; <span class="text-amber-300">setCount</span>(<span class="text-cyan-400">c</span> =&gt; <span class="text-cyan-400">c</span> + <span class="text-cyan-400">1</span>)}</div>
+<div class="pl-12 text-cyan-300">/&gt;</div>
+<div class="pl-8 text-cyan-300">&lt;/<span class="text-cyan-400">div</span>&gt;</div>
+<div class="pl-4">);</div>
+<div>}</div>
+</div>
+</div>
+</section>
+<!-- Live Preview Panel -->
+<section class="flex-1 flex flex-col bg-obsidian-950 min-w-0" data-purpose="live-preview-panel">
+<!-- Browser Address & Device Toolbar -->
+<div class="h-10 bg-obsidian-950/90 border-b border-slate-800/80 flex items-center justify-between px-3 gap-3">
+<!-- Responsive Device View Toggles -->
+<div class="flex items-center space-x-1 bg-obsidian-900 border border-slate-800 p-0.5 rounded-md">
+<button class="p-1 rounded bg-indigo-600/30 text-indigo-300" title="Desktop view">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-200" title="Tablet view">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-200" title="Mobile view">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- URL Bar -->
+<div class="flex-1 flex items-center bg-obsidian-900 border border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-400 group focus-within:border-slate-700">
+<span class="text-emerald-400 mr-2 flex items-center gap-1 font-mono text-[11px]">
+<svg class="w-3 h-3 text-emerald-400 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                https://
+              </span>
+<span class="text-slate-200 font-mono tracking-tight truncate">01a1d3f5-preview.sandboxforge.dev</span>
+<div class="ml-auto flex items-center space-x-1 pl-2">
+<button class="p-0.5 text-slate-400 hover:text-white" title="Refresh frame">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Frame Actions -->
+<div class="flex items-center space-x-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/60" title="Inspect element">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Live Preview Canvas: Rendered High-Quality SaaS UI -->
+<div class="flex-1 bg-[#05070d] relative overflow-y-auto flex flex-col items-center justify-center p-6">
+<!-- Subtle Radial Gradient Background for Preview -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/25 via-[#05070d] to-[#05070d] pointer-events-none"></div>
+<!-- Preview Card Canvas -->
+<div class="relative z-10 w-full max-w-lg rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800/90 p-8 shadow-2xl backdrop-blur-xl text-center">
+<!-- Vibrant Pill -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold tracking-wide uppercase mb-6 shadow-glow-cyan">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                Next-Gen AI Apps
+              </div>
+<!-- Main Hero Heading -->
+<h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
+                Build &amp; Ship in
+                <span class="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Real-Time</span>
+</h1>
+<!-- Subtitle -->
+<p class="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm mx-auto">
+                Instant hot-reloading React 19 environment powered by intelligent streaming AI companions.
+              </p>
+<!-- Interactive Counter Widget in Preview -->
+<div class="bg-obsidian-950/80 rounded-xl p-4 border border-slate-800/80 max-w-xs mx-auto mb-6 flex items-center justify-between shadow-inner">
+<div class="text-left">
+<div class="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Metrics Counter</div>
+<div class="text-xl font-bold font-mono text-cyan-400">42 <span class="text-xs font-normal text-slate-500">events/s</span></div>
+</div>
+<div class="flex items-center space-x-1.5">
+<button class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all active:scale-95">+</button>
+<button class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm transition-all active:scale-95">-</button>
+</div>
+</div>
+<!-- CTA Buttons -->
+<div class="flex items-center justify-center gap-3">
+<button class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-500 text-white text-xs font-semibold shadow-glow-indigo hover:opacity-95 transition-all">
+                  Get Started Free
+                </button>
+<button class="px-4 py-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-all">
+                  Explore Components
+                </button>
+</div>
+</div>
+<!-- Watermark / Footer in Frame -->
+<div class="mt-6 text-center text-[11px] text-slate-600 font-mono">
+              SandboxForge Engine • Vite 5.4 • Zero latency sync
+            </div>
+</div>
+</section>
+</div>
+<!-- Integrated Bottom Terminal Panel -->
+<section class="h-44 bg-obsidian-950 border-t border-slate-800/80 flex flex-col shrink-0" data-purpose="terminal-panel">
+<!-- Terminal Header Toolbar -->
+<div class="h-8 bg-obsidian-900/90 border-b border-slate-800/80 px-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<!-- Active Terminal Tab -->
+<button class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-white border-b-2 border-cyan-400 bg-obsidian-950/60">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span>Terminal</span>
+</button>
+<button class="px-2.5 py-1 text-xs font-medium text-slate-400 hover:text-slate-200">
+              Build Logs
+            </button>
+<button class="px-2.5 py-1 text-xs font-medium text-slate-400 hover:text-slate-200">
+              Problems <span class="ml-1 px-1 rounded-full bg-slate-800 text-[10px] text-slate-400">0</span>
+</button>
+</div>
+<!-- Terminal Controls -->
+<div class="flex items-center space-x-2 text-slate-400">
+<span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">zsh</span>
+<button class="p-1 hover:text-white" title="Clear console">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1 hover:text-white" title="Split terminal">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1 hover:text-white" title="Close Panel">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Terminal Output View -->
+<div class="flex-1 p-3 overflow-y-auto font-mono text-[12px] leading-relaxed text-slate-300 space-y-1 select-text">
+<div class="text-indigo-400 font-semibold">[SandboxForge Agent] <span class="text-slate-300 font-normal">Initializing secure isolated microVM environment...</span></div>
+<div class="text-emerald-400 font-semibold">[Connected] <span class="text-slate-300 font-normal">Agent socket established via WebSocket (latency: 14ms).</span></div>
+<div class="text-slate-400"><span class="text-cyan-400 font-semibold">&gt; vite@5.4.1 dev</span></div>
+<div class="text-slate-300"><span class="text-emerald-400 font-bold">VITE v5.4.1</span> <span class="text-slate-400">ready in</span> <span class="text-white font-semibold">182 ms</span></div>
+<div class="text-slate-400 pl-2">
+            ➜ <span class="text-slate-300">Local:</span> <span class="text-cyan-400 underline">http://localhost:5173/</span>
+</div>
+<div class="text-slate-400 pl-2">
+            ➜ <span class="text-slate-300">Network:</span> <span class="text-cyan-400 underline">http://10.0.4.12:5173/</span>
+</div>
+<div class="flex items-center gap-1.5 text-cyan-300 pt-1">
+<span class="text-emerald-400 font-semibold">sandbox@forge:~/workspace$</span>
+<span class="text-slate-200">npm run build</span>
+<span class="inline-block w-2 h-4 bg-cyan-400 animate-blink"></span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Sidebar: AI Assistant Copilot -->
+<aside class="w-80 bg-obsidian-950/95 border-l border-slate-800/80 flex flex-col shrink-0" data-purpose="ai-assistant-panel">
+<!-- AI Header -->
+<div class="h-10 px-3.5 border-b border-slate-800/80 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-5 h-5 rounded-md bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white shadow-glow-indigo">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-xs font-semibold text-white tracking-tight">AI Assistant</span>
+<span class="text-[10px] font-medium px-1.5 py-0.2 rounded bg-violet-500/15 text-violet-300 border border-violet-500/20">SSE Stream</span>
+</div>
+<div class="flex items-center space-x-1.5">
+<span class="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Ready
+          </span>
+</div>
+</div>
+<!-- AI Chat Stream History -->
+<div class="flex-1 overflow-y-auto p-3.5 space-y-4 text-xs">
+<!-- AI Response Bubble -->
+<div class="flex flex-col space-y-2">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-semibold tracking-wider text-violet-400 uppercase">Sandbox Copilot</span>
+<span class="text-[10px] text-slate-500">Just now</span>
+</div>
+<div class="bg-obsidian-900/90 border border-slate-800/90 rounded-2xl rounded-tl-sm p-3.5 text-slate-300 shadow-sm leading-relaxed">
+            I’ve scaffolded a clean <span class="text-cyan-400 font-medium">React 19 + Vite</span> setup with Tailwind configured. The preview reflects your current component state in real time.
+            <div class="mt-2.5 p-2 rounded-lg bg-obsidian-950/80 border border-slate-800/80 font-mono text-[11px] text-slate-400">
+              ⚡ Code &amp; Live DOM updated synchronously.
+            </div>
+</div>
+</div>
+<!-- Quick AI Suggestions Section -->
+<div>
+<div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            Suggestions
+          </div>
+<div class="space-y-1.5">
+<!-- Suggestion Chip 1 -->
+<button class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 hover:bg-slate-800/60 border border-slate-800/80 hover:border-indigo-500/40 text-slate-300 hover:text-white transition group flex items-center justify-between">
+<span class="text-xs">✨ Add glowing modern Hero section</span>
+<svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Suggestion Chip 2 -->
+<button class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 hover:bg-slate-800/60 border border-slate-800/80 hover:border-cyan-500/40 text-slate-300 hover:text-white transition group flex items-center justify-between">
+<span class="text-xs">🎨 Apply vibrant neon gradient theme</span>
+<svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Suggestion Chip 3 -->
+<button class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 hover:bg-slate-800/60 border border-slate-800/80 hover:border-violet-500/40 text-slate-300 hover:text-white transition group flex items-center justify-between">
+<span class="text-xs">⚡ Add interactive Counter component</span>
+<svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Suggestion Chip 4 -->
+<button class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 hover:bg-slate-800/60 border border-slate-800/80 hover:border-emerald-500/40 text-slate-300 hover:text-white transition group flex items-center justify-between">
+<span class="text-xs">🧭 Create responsive Navbar with logo</span>
+<svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+<!-- AI Prompt Input Container -->
+<div class="p-3 border-t border-slate-800/80 bg-obsidian-950">
+<div class="relative rounded-xl bg-obsidian-900 border border-slate-800 focus-within:border-indigo-500/80 focus-within:ring-1 focus-within:ring-indigo-500/80 transition shadow-inner">
+<textarea class="w-full bg-transparent px-3 pt-2.5 pb-8 text-xs text-slate-200 placeholder-slate-500 resize-none border-0 focus:ring-0 focus:outline-none" placeholder="Ask AI to generate, redesign, or modify components..." rows="2"></textarea>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+<div class="flex items-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-white rounded" title="Attach file or code context">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<span class="text-[10px] text-slate-500">Shift+Enter for newline</span>
+</div>
+<!-- Glowing Send Action -->
+<button class="w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-glow-indigo hover:opacity-90 active:scale-95 transition-all" title="Send prompt">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- END: MainWorkspaceLayout -->
+<!-- BEGIN: BottomStatusBar -->
+<footer class="h-6 bg-obsidian-950 border-t border-slate-800/80 px-3 flex items-center justify-between text-[11px] text-slate-400 font-mono select-none">
+<!-- Status Left -->
+<div class="flex items-center space-x-3">
+<!-- Git Branch -->
+<div class="flex items-center space-x-1 text-slate-300 hover:text-white cursor-pointer">
+<svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>main*</span>
+</div>
+<!-- Sandbox Health -->
+<div class="flex items-center space-x-1.5 text-slate-400">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="text-slate-300">Sandbox: <span class="text-cyan-400">01a1d3f5-3326</span></span>
+</div>
+<!-- Sync Status -->
+<span class="text-slate-500 hidden sm:inline">0 errors, 0 warnings</span>
+</div>
+<!-- Status Right -->
+<div class="flex items-center space-x-3 text-slate-400">
+<div class="hidden md:flex items-center space-x-1">
+<svg class="w-3 h-3 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Custom 3-Column</span>
+</div>
+<span>TypeScript 5.5</span>
+<span class="text-emerald-400">React 19 + Vite</span>
+<span class="bg-indigo-500/10 text-indigo-300 px-1.5 rounded border border-indigo-500/20">Port: 5173</span>
+<!-- Theme Pill -->
+<button class="text-slate-400 hover:text-white flex items-center gap-1" title="Dark theme active">
+<svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[10px]">Dark</span>
+</button>
+</div>
+</footer>
+<!-- END: BottomStatusBar -->
+</body></html>

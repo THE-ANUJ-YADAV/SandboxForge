@@ -9,7 +9,6 @@ import {
   Check,
   Copy,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 import { useSandbox } from '../context/useSandbox';
 
@@ -23,7 +22,7 @@ export default function LivePreview() {
   } = useSandbox();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [deviceMode, setDeviceMode] = useState('responsive'); // 'responsive' | 'tablet' | 'mobile'
+  const [deviceMode, setDeviceMode] = useState('desktop'); // 'desktop' | 'tablet' | 'mobile'
   const [copied, setCopied] = useState(false);
   const iframeRef = useRef(null);
 
@@ -47,9 +46,9 @@ export default function LivePreview() {
   const getContainerWidth = () => {
     switch (deviceMode) {
       case 'mobile':
-        return 'max-w-[390px] shadow-2xl rounded-2xl border border-slate-300 dark:border-slate-700 overflow-hidden my-4';
+        return 'max-w-[390px] h-[720px] rounded-3xl border border-slate-300 dark:border-slate-800 shadow-2xl overflow-hidden my-auto';
       case 'tablet':
-        return 'max-w-[768px] shadow-xl rounded-xl border border-slate-300 dark:border-slate-700 overflow-hidden my-3';
+        return 'max-w-[768px] h-[90%] rounded-2xl border border-slate-300 dark:border-slate-800 shadow-2xl overflow-hidden my-auto';
       default:
         return 'w-full h-full';
     }
@@ -57,144 +56,163 @@ export default function LivePreview() {
 
   if (status !== 'running' || !previewUrl) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-500 select-none">
-        <div className="relative mb-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center">
-            <Globe className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+      <section className="flex-1 flex flex-col bg-slate-50 dark:bg-obsidian-950 min-w-0 h-full overflow-hidden select-none transition-colors" data-purpose="live-preview-panel">
+        {/* Toolbar */}
+        <div className="h-10 bg-white dark:bg-obsidian-950/90 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between px-3 shrink-0">
+          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-obsidian-900 border border-slate-200 dark:border-slate-800 p-0.5 rounded-md text-slate-500">
+            <span className="text-xs px-2 py-0.5 font-medium text-slate-600 dark:text-slate-400">Live Preview</span>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          </div>
+          <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">Offline</span>
         </div>
 
-        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
-          Live Preview Inactive
-        </h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm text-center mb-5 leading-relaxed">
-          Create a sandbox to spawn an isolated development environment and preview your live React application.
-        </p>
+        {/* Empty State Surface */}
+        <div className="flex-1 bg-slate-100/60 dark:bg-[#05070d] relative flex flex-col items-center justify-center p-6 text-center">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 dark:from-indigo-900/20 via-transparent to-transparent pointer-events-none"></div>
 
-        <button
-          onClick={startSandbox}
-          disabled={status === 'starting'}
-          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-500/25 flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
-        >
-          {status === 'starting' ? (
-            <>
-              <RotateCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Creating Environment...</span>
-            </>
-          ) : (
-            <>
-              <Layers className="w-3.5 h-3.5" />
-              <span>Start Development Sandbox</span>
-            </>
-          )}
-        </button>
-      </div>
+          <div className="relative z-10 w-full max-w-sm rounded-2xl bg-white dark:bg-obsidian-900/90 border border-slate-200 dark:border-slate-800/90 p-8 shadow-xl dark:shadow-2xl backdrop-blur-xl flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-cyan-400 mb-4 shadow-sm dark:shadow-glow-cyan">
+              <Globe className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">
+              Live Preview Inactive
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5 max-w-xs">
+              Start the sandbox environment to spawn the isolated microVM and render your live frontend preview.
+            </p>
+
+            <button
+              onClick={startSandbox}
+              disabled={status === 'starting'}
+              className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm dark:shadow-glow-indigo flex items-center gap-2 transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
+            >
+              {status === 'starting' ? (
+                <>
+                  <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Creating Sandbox...</span>
+                </>
+              ) : (
+                <>
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Start Development Sandbox</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
-      {/* Browser-like Toolbar */}
-      <div className="h-10 px-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0 select-none">
-        {/* Device Switcher */}
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
+    <section className="flex-1 flex flex-col bg-slate-50 dark:bg-obsidian-950 min-w-0 h-full overflow-hidden select-none transition-colors duration-150" data-purpose="live-preview-panel">
+      {/* Browser Address & Device Toolbar */}
+      <div className="h-10 bg-white dark:bg-obsidian-950/90 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between px-3 gap-3 shrink-0">
+        {/* Responsive Device View Toggles */}
+        <div className="flex items-center space-x-1 bg-slate-100 dark:bg-obsidian-900 border border-slate-200 dark:border-slate-800 p-0.5 rounded-md">
           <button
-            onClick={() => setDeviceMode('responsive')}
-            title="Desktop View"
-            className={`p-1 rounded transition-colors ${
-              deviceMode === 'responsive'
-                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            onClick={() => setDeviceMode('desktop')}
+            className={`p-1 rounded transition-colors cursor-pointer ${
+              deviceMode === 'desktop'
+                ? 'bg-white dark:bg-indigo-600/30 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
+            title="Desktop view"
           >
             <Laptop className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setDeviceMode('tablet')}
-            title="Tablet View (768px)"
-            className={`p-1 rounded transition-colors ${
+            className={`p-1 rounded transition-colors cursor-pointer ${
               deviceMode === 'tablet'
-                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-indigo-600/30 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
+            title="Tablet view (768px)"
           >
             <Tablet className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setDeviceMode('mobile')}
-            title="Mobile View (390px)"
-            className={`p-1 rounded transition-colors ${
+            className={`p-1 rounded transition-colors cursor-pointer ${
               deviceMode === 'mobile'
-                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-indigo-600/30 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
+            title="Mobile view (390px)"
           >
             <Smartphone className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Address Bar */}
-        <div className="flex-1 max-w-xl mx-auto flex items-center bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-slate-700 dark:text-slate-300 font-mono">
-          <Globe className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
-          <span className="truncate flex-1 text-[11px] select-text">{previewUrl}</span>
-          <button
-            onClick={handleCopyUrl}
-            title="Copy URL"
-            className="ml-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-          </button>
+        {/* Real URL Bar */}
+        <div className="flex-1 max-w-xl flex items-center bg-slate-100 dark:bg-obsidian-900 border border-slate-200 dark:border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-600 dark:text-slate-400 group focus-within:border-slate-400 dark:focus-within:border-slate-700">
+          <span className="text-emerald-600 dark:text-emerald-400 mr-2 flex items-center gap-1 font-mono text-[11px] shrink-0">
+            <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+            </svg>
+            https://
+          </span>
+          <span className="text-slate-800 dark:text-slate-200 font-mono tracking-tight truncate flex-1 select-text">
+            {previewUrl.replace(/^https?:\/\//, '')}
+          </span>
+          <div className="ml-auto flex items-center space-x-1 pl-2 shrink-0">
+            <button
+              onClick={handleCopyUrl}
+              className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              title="Copy URL"
+            >
+              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+            </button>
+            <button
+              onClick={handleManualRefresh}
+              className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              title="Refresh frame"
+            >
+              <RotateCw className={`w-3 h-3 ${isLoading ? 'animate-spin text-indigo-600 dark:text-cyan-400' : ''}`} />
+            </button>
+          </div>
         </div>
 
-        {/* Refresh & Open in New Tab */}
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={handleManualRefresh}
-            title="Reload Preview"
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          >
-            <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-indigo-500' : ''}`} />
-          </button>
+        {/* Frame Actions */}
+        <div className="flex items-center space-x-1">
           <a
             href={previewUrl}
             target="_blank"
             rel="noopener noreferrer"
-            title="Open in new window"
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1 rounded text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/60 cursor-pointer"
+            title="Open preview in new tab"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
 
-      {/* Preview Container */}
-      <div className="flex-1 relative flex items-center justify-center p-0 overflow-auto bg-slate-200/50 dark:bg-slate-950/60">
+      {/* Live Preview Canvas Surface */}
+      <div className="flex-1 bg-slate-200/50 dark:bg-[#05070d] relative overflow-auto flex items-center justify-center p-3">
         {/* Loading Overlay */}
         {isLoading && (
-          <div className="absolute inset-0 z-10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xs flex items-center justify-center">
-            <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg text-xs font-medium text-slate-700 dark:text-slate-200">
-              <RotateCw className="w-4 h-4 animate-spin text-indigo-500" />
+          <div className="absolute inset-0 z-10 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xs flex items-center justify-center">
+            <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-obsidian-900 border border-slate-200 dark:border-slate-800 shadow-lg text-xs font-medium text-slate-800 dark:text-slate-200">
+              <RotateCw className="w-4 h-4 animate-spin text-indigo-600 dark:text-cyan-400" />
               <span>Rendering live application...</span>
             </div>
           </div>
         )}
 
-        {/* Live Iframe: Independent of IDE theme as requested */}
-        <div className={`transition-all duration-300 h-full flex items-center justify-center ${getContainerWidth()}`}>
+        {/* Live Iframe */}
+        <div className={`transition-all duration-300 w-full h-full flex items-center justify-center ${getContainerWidth()}`}>
           <iframe
             key={previewKey}
             ref={iframeRef}
             src={previewUrl}
             title="Live Sandbox Preview"
             onLoad={handleIframeLoad}
-            className="w-full h-full bg-white border-0 shadow-inner"
+            className="w-full h-full bg-white border-0 shadow-xl"
             sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 }
